@@ -2,7 +2,7 @@ import os
 import csv
 import random
 
-data_path = '/Users/baiwentao/code/movielens/data'
+data_path = '/Users/baiwentao/code/RecommendationSystem/data-least'
 
 
 def read_csv(r_path):
