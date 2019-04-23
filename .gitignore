@@ -105,4 +105,4 @@ ENV/
 test.py
 
 # data file
-data/
+data*/
