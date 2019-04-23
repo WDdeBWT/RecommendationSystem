@@ -1,7 +1,8 @@
 import os
 import csv
-import time
 import random
+
+data_path = '/Users/baiwentao/code/movielens/data'
 
 
 def read_csv(r_path):
@@ -22,4 +23,13 @@ def write_csv(w_path, content_list):
                 line[0].strip()
                 writer.writerow(line)
 
-def split_data(data):
+
+def split_data(rate_list, round):
+    train_data = []
+    test_data = []
+    for rate in rate_list:
+        if random.randint(1,10) == round:
+            test_data.append(rate)
+        else:
+            train_data.append(rate)
+    return train_data, test_data
