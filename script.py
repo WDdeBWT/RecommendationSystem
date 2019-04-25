@@ -7,8 +7,8 @@ import evaluator
 def test():
     sim_num = 30
     recm_num = 15
-
-    rate_list = utils.read_csv(utils.data_path)[1:]
+    data_path = 'sample_data.csv'
+    rate_list = utils.read_csv(data_path)[1:]
     train_data, test_data = utils.split_data(rate_list, 1)
     ub_model = model.UserBasedModel(train_data)
     ub_model.get_sim(sim_num)
