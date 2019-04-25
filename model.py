@@ -3,10 +3,11 @@ import time
 
 class RecmModel:
 
-    def __init__(self, train_data):
+    def __init__(self, train_data, show_detail):
         self.data_udict = {} # {userId: [movieId, ]}
         self.data_idict = {} # {movieID: [userId, ]}
         self.sim_table = {} # {userId: [sim_user, ]}
+        self.show_detail = show_detail
 
         index = 0
         Percentage = 0
@@ -15,7 +16,8 @@ class RecmModel:
             # rate: [userId,movieId,rating,timestamp]
             if index % (len_tdata // 100) == 0:
                 time_str = time.strftime("%H:%M:%S", time.localtime())
-                print('---time: ' + time_str + ' - init_model: ' + str(Percentage) + '% ' + str(index) + '/' + str(len_tdata))
+                if self.show_detail:
+                    print('---time: ' + time_str + ' - init_model: ' + str(Percentage) + '% ' + str(index) + '/' + str(len_tdata))
                 Percentage += 1
             if rate[0] not in self.data_udict:
                 self.data_udict[rate[0]] = []
@@ -48,7 +50,8 @@ class UserBasedModel(RecmModel):
         for user_id in self.data_udict:
             if index % (len_udict // 100) == 0:
                 time_str = time.strftime("%H:%M:%S", time.localtime())
-                print('---time: ' + time_str + ' - get_sim: ' + str(Percentage) + '% ' + str(index) + '/' + str(len_udict))
+                if self.show_detail:
+                    print('---time: ' + time_str + ' - get_sim: ' + str(Percentage) + '% ' + str(index) + '/' + str(len_udict))
                 Percentage += 1
             sim_table[user_id] = {}
             for movie_id in self.data_udict[user_id]:
@@ -70,7 +73,8 @@ class UserBasedModel(RecmModel):
         for user_id in self.sim_table:
             if index % (len_table // 100) == 0:
                 time_str = time.strftime("%H:%M:%S", time.localtime())
-                print('---time: ' + time_str + ' - get_recm: ' + str(Percentage) + '% ' + str(index) + '/' + str(len_table))
+                if self.show_detail:
+                    print('---time: ' + time_str + ' - get_recm: ' + str(Percentage) + '% ' + str(index) + '/' + str(len_table))
                 Percentage += 1
             recm_table[user_id] = {}
             for sim_user in self.sim_table[user_id]:
