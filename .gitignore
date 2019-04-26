@@ -106,3 +106,6 @@ test.py
 
 # data file
 data*/
+
+# log file
+log*

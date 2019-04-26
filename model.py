@@ -17,7 +17,8 @@ class RecmModel:
             if index % (len_tdata // 100) == 0:
                 time_str = time.strftime("%H:%M:%S", time.localtime())
                 if self.show_detail:
-                    print('---time: ' + time_str + ' - init_model: ' + str(Percentage) + '% ' + str(index) + '/' + str(len_tdata))
+                    if Percentage % 10 == 0:
+                        print('---time: ' + time_str + ' - init_model: ' + str(Percentage) + '% ' + str(index) + '/' + str(len_tdata))
                 Percentage += 1
             if rate[0] not in self.data_udict:
                 self.data_udict[rate[0]] = []
@@ -27,22 +28,33 @@ class RecmModel:
             self.data_idict[rate[1]].append(rate[0])
             index += 1
 
-
-class RandomModel(RecmModel):
-
     def get_sim(self, sim_num):
         pass
 
     def get_recm(self, recm_num):
+        pass
+
+
+class HottestModel(RecmModel):
+
+    def get_topN_movie(self, pop_num=100):
+        return [item[0] for item in sorted(self.data_idict.items(), key=lambda hit: len(hit[1]), reverse=True)][:pop_num]
+
+    def get_recm(self, recm_num=15):
         recm_table = {} # {userId: [recm_movie, ]}
+        top100_movie = self.get_topN_movie(100)
         for user_id in self.data_udict:
-            for i in range(recm_num):
-                pass
+            recm_table[user_id] = []
+            for movie in top100_movie:
+                if movie not in self.data_udict[user_id]:
+                    recm_table[user_id].append(movie)
+            recm_table[user_id] = recm_table[user_id][:recm_num]
+        return recm_table
 
 
 class UserBasedModel(RecmModel):
 
-    def get_sim(self, sim_num):
+    def get_sim(self, sim_num=30):
         index = 0
         Percentage = 0
         len_udict = len(self.data_udict)
@@ -65,7 +77,7 @@ class UserBasedModel(RecmModel):
             index += 1
         self.sim_table = sim_table
 
-    def get_recm(self, recm_num):
+    def get_recm(self, recm_num=15):
         index = 0
         Percentage = 0
         len_table = len(self.sim_table)

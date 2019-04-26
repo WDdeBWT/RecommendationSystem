@@ -54,7 +54,7 @@ class Evaluator:
         return len(recommend_items) / (len(all_items) * 1.0)
 
 
-    def Popularity(self):
+    def popularity(self):
         item_popularity = dict()
         for rate in self.rate_list:
             # rate: [userId,movieId,rating,timestamp]

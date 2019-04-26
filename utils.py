@@ -26,13 +26,22 @@ def read_csv(r_path, show_detail=True):
 def write_csv(w_path, content_list, show_detail=True):
     with open(w_path, 'w', newline="") as w:
         if show_detail:
-            print('Start write_csv... ', end='')
+            print('Start write_csv... ', end='', flush=True)
         writer = csv.writer(w)
         if content_list:
             for line in content_list:
                 writer.writerow(line)
         if show_detail:
             print('finish')
+
+
+def write_log(w_path, content_list):
+    with open(w_path, 'a') as w:
+        if content_list:
+            time_str = time.strftime("%H:%M:%S", time.localtime())
+            w.write('\n--- time: ' + time_str + ' ---\n')
+            for line in content_list:
+                w.write(str(line) + '\n')
 
 
 def split_data(rate_list, round, show_detail=True):
