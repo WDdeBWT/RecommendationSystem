@@ -102,7 +102,7 @@ ENV/
 .mypy_cache/
 
 # test file
-test.py
+test*
 
 # data file
 data*/
