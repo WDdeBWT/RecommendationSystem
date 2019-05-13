@@ -7,11 +7,12 @@ import utils
 
 class TrainData:
 
-    def __init__(self, train_data, show_detail = False):
+    def __init__(self, train_data, show_detail = False, only_hot = False):
         self.data_udict = {} # {userId: {movieId: rate}}
         self.data_idict = {} # {movieID: {userId: rate}
         self.rate_mat = None
         self.show_detail = show_detail
+        self.only_hot = only_hot
         self._build_init(train_data)
 
     def _build_init(self, train_data):
@@ -34,6 +35,13 @@ class TrainData:
                 self.data_idict[rate[1]] = {}
             self.data_idict[rate[1]][rate[0]] = rate[2]
             index += 1
+        if self.only_hot:
+            for movie_id in list(self.data_idict.keys()):
+                if len(self.data_idict[movie_id]) < 20:
+                    self.data_idict.pop(movie_id)
+                    for user_id in list(self.data_udict.keys()):
+                        if movie_id in self.data_udict[user_id]:
+                            self.data_udict[user_id].pop(movie_id)
 
     def get_rate_mat(self):
         user_list = list(self.data_udict.keys())
@@ -45,4 +53,5 @@ class TrainData:
                 print('---time:{} - TrainData.get_rate_mat {}/{}'.format(time_str, str(index+1), str(len(user_list))))
             for movie_id in self.data_udict[user_id]:
                 rate_mat[user_list.index(user_id)][movie_list.index(movie_id)] = self.data_udict[user_id][movie_id]
+        print('rate_mat shape: {}'.format(rate_mat.shape))
         self.rate_mat = rate_mat

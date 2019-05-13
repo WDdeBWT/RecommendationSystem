@@ -1,6 +1,7 @@
 import random
 import operator
 import math
+import time
 
 import numpy as np
 
@@ -18,10 +19,9 @@ class FCM:
         self.m = m
         self.show_detail = show_detail
 
-
     # 返回的矩阵是每个点属于不同的集群的概率（隶属度）
     # 随机生成
-    def initializeMembershipMatrix(self):
+    def initialize_membership_matrix(self):
         membership_mat = list()
         for i in range(self.item_num):
             random_num_list = [random.random() for i in range(self.clusters)]
@@ -30,8 +30,7 @@ class FCM:
             membership_mat.append(temp_list)
         return membership_mat
 
-
-    def calculateClusterCenter(self, membership_mat):
+    def calculate_cluster_center(self, membership_mat):
         item_mem_of_each_clu = list(zip(*membership_mat))
         # item_mem_of_each_clu 's shape is (k, n)
         cluster_centers = list()
@@ -55,8 +54,7 @@ class FCM:
             cluster_centers.append(center)
         return cluster_centers
 
-
-    def updateMembershipValue(self, membership_mat, cluster_centers):
+    def update_membership_value(self, membership_mat, cluster_centers):
         # m is the Fuzzy parameter.
         p = float(2 / (self.m - 1))
         # cluster_centers : (k, num_attr)
@@ -70,28 +68,30 @@ class FCM:
                 membership_mat[i][j] = float(1 / den)
         return membership_mat
 
+    def get_loss(self, membership_mat, cluster_centers):
+        loss = 0
+        for i in range(self.item_num):
+            for j in range(self.clusters):
+                data_point = list(self.inp_mat[i])
+                distance = np.linalg.norm(list(map(operator.sub, data_point, cluster_centers[j])))
+                loss += membership_mat[i][j] ** self.m * distance
+        return loss
 
-    # def getClusters(membership_mat):
-    #     cluster_labels = list()
-    #     for i in range(self.item_num):
-    #         max_val, idx = max((val, idx) for (idx, val) in enumerate(membership_mat[i]))
-    #         cluster_labels.append(idx)
-    #     return cluster_labels
-
-
-    def fuzzyCMeansClustering(self):
+    def get_result(self):
         # Membership Matrix
-        membership_mat = self.initializeMembershipMatrix()
+        membership_mat = self.initialize_membership_matrix()
         curr = 0
         while curr <= self.max_iter:
-            cluster_centers = self.calculateClusterCenter(membership_mat)
+            cluster_centers = self.calculate_cluster_center(membership_mat)
             # cluster_centers: (k, num_attr). k means k clusters. And num_attr means num_attr features.
             # 更新 membership_mat 矩阵
-            membership_mat = self.updateMembershipValue(membership_mat, cluster_centers)
+            membership_mat = self.update_membership_value(membership_mat, cluster_centers)
             # cluster_labels = getClusters(membership_mat)
             curr += 1
+            loss = self.get_loss(membership_mat, cluster_centers)
             if self.show_detail:
-                print('curr: {}/{}'.format(curr, self.max_iter))
+                time_str = time.strftime("%H:%M:%S", time.localtime())
+                print('---time:{} - curr: {}/{} - loss: {}'.format(time_str, curr, self.max_iter, loss))
         # print(membership_mat)
         return membership_mat, cluster_centers
 
