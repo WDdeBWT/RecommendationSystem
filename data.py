@@ -10,7 +10,8 @@ class TrainData:
     def __init__(self, train_data, show_detail = False, only_hot = False):
         self.data_udict = {} # {userId: {movieId: rate}}
         self.data_idict = {} # {movieID: {userId: rate}
-        self.rate_mat = None
+        self.rate_umat = None
+        self.rate_imat = None
         self.show_detail = show_detail
         self.only_hot = only_hot
         self._build_init(train_data)
@@ -46,12 +47,15 @@ class TrainData:
     def get_rate_mat(self):
         user_list = list(self.data_udict.keys())
         movie_list = list(self.data_idict.keys())
-        rate_mat = np.zeros((len(user_list), len(movie_list)))
+        rate_umat = np.zeros((len(user_list), len(movie_list)))
+        rate_imat = np.zeros((len(movie_list), len(user_list)))
         for index, user_id in enumerate(user_list):
-            if (index + 1) % (len(user_list) // 100) == 0 and self.show_detail:
+            if (index + 1) % (len(user_list) // 10) == 0 and self.show_detail:
                 time_str = time.strftime("%H:%M:%S", time.localtime())
                 print('---time:{} - TrainData.get_rate_mat {}/{}'.format(time_str, str(index+1), str(len(user_list))))
             for movie_id in self.data_udict[user_id]:
-                rate_mat[user_list.index(user_id)][movie_list.index(movie_id)] = self.data_udict[user_id][movie_id]
-        print('rate_mat shape: {}'.format(rate_mat.shape))
-        self.rate_mat = rate_mat
+                rate_umat[user_list.index(user_id)][movie_list.index(movie_id)] = self.data_udict[user_id][movie_id]
+                rate_imat[movie_list.index(movie_id)][user_list.index(user_id)] = self.data_udict[user_id][movie_id]
+        print('rate_umat shape: {}'.format(rate_umat.shape))
+        self.rate_umat = rate_umat
+        self.rate_imat = rate_imat

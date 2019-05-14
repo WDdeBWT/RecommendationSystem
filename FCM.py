@@ -81,24 +81,31 @@ class FCM:
         # Membership Matrix
         membership_mat = self.initialize_membership_matrix()
         curr = 0
+        loss_old = 1
+        loss_new = 1
         while curr <= self.max_iter:
             cluster_centers = self.calculate_cluster_center(membership_mat)
             # cluster_centers: (k, num_attr). k means k clusters. And num_attr means num_attr features.
             # 更新 membership_mat 矩阵
             membership_mat = self.update_membership_value(membership_mat, cluster_centers)
             # cluster_labels = getClusters(membership_mat)
+            loss_old = loss_new
+            loss_new = self.get_loss(membership_mat, cluster_centers)
             curr += 1
-            loss = self.get_loss(membership_mat, cluster_centers)
             if self.show_detail:
                 time_str = time.strftime("%H:%M:%S", time.localtime())
-                print('---time:{} - curr: {}/{} - loss: {}'.format(time_str, curr, self.max_iter, loss))
+                print('---time:{} - curr: {}/{} - loss: {}'.format(time_str, curr, self.max_iter, loss_new))
+            if abs(loss_old - loss_new) / loss_old < 0.0001:
+                print('(loss_old - loss_new) / loss_old < 0.01%, FCM finish')
+                break
         # print(membership_mat)
         return membership_mat, cluster_centers
 
 
-data_path = 'data-least/ratings.csv'
-rate_list = utils.read_csv(data_path, False)[1:]
-max_user_id = max(int(item[0]) for item in rate_list)
-max_movie_id = max(int(item[1]) for item in rate_list)
-print(max_user_id)
-print(max_movie_id)
+if __name__ == "__main__":
+    data_path = 'data-least/ratings.csv'
+    rate_list = utils.read_csv(data_path, False)[1:]
+    max_user_id = max(int(item[0]) for item in rate_list)
+    max_movie_id = max(int(item[1]) for item in rate_list)
+    print(max_user_id)
+    print(max_movie_id)
