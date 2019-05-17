@@ -1,5 +1,4 @@
 import time
-import random
 
 import numpy as np
 
@@ -102,7 +101,7 @@ class TrainData:
                     fuzzy_mat[self.user_index_dict[user_id]][self.movie_index_dict[movie_id]][i] = rate[i]
         self.fuzzy_mat = fuzzy_mat
 
-    def get_user_sim(self, fuzzy_mode=True):
+    def get_user_sim(self, fuzzy_mod=True):
         def get_cos_sim(v1, v2):
             num = np.dot(v1, v2)
             denom = np.linalg.norm(v1) * np.linalg.norm(v2)
@@ -110,15 +109,14 @@ class TrainData:
 
         user_sim_mat = np.zeros((len(self.user_list), len(self.user_list)))
         for index, user_id in enumerate(self.user_list):
-            if (index + 1) % (len(self.user_list) // 10) == 0 and self.show_detail:
+            # if (index + 1) % (len(self.user_list) // 10) == 0 and self.show_detail:
+            if self.show_detail:
                 time_str = time.strftime("%H:%M:%S", time.localtime())
                 print('-time: {} - TrainData.get_user_sim {}/{}'.format(time_str, str(index+1), str(len(self.data_udict))))
             ui = self.user_index_dict[user_id] # user_index
             for target_user_id in self.user_list:
                 ti = self.user_index_dict[target_user_id] # target_user_index
-                if ui == ti:
-                    continue
-                if fuzzy_mode:
+                if fuzzy_mod:
                     common_count = 0
                     for movie_id in self.movie_list:
                         if movie_id in self.data_udict[user_id] and movie_id in self.data_udict[target_user_id]:
@@ -139,31 +137,16 @@ class TrainData:
             user_sim_mat[self.user_index_dict[user_id]] /= sum(user_sim_mat[self.user_index_dict[user_id]])
         self.user_sim_mat = user_sim_mat
 
-    def get_user_group(self, distance, walk_times = 1000):
-        # user group member weight replace sim value
-        new_sim_mat = np.zeros((len(self.user_list), len(self.user_list)))
-        for index, user_id in enumerate(self.user_list):
-            if (index + 1) % (len(self.user_list) // 10) == 0 and self.show_detail:
-                time_str = time.strftime("%H:%M:%S", time.localtime())
-                print('-time: {} - TrainData.get_user_group {}/{}'.format(time_str, str(index+1), str(len(self.user_list))))
-            group = {} # {index: hit_times}
-            for i in range(walk_times):
-                crt_user = index
-                for i in range(distance):
-                    sum_p = 0 # sum probability
-                    tar_p = random.random() # target probability
-                    for target_user_index in range(len(self.user_list)):
-                        sum_p += self.user_sim_mat[crt_user][target_user_index]
-                        if sum_p > tar_p:
-                            if crt_user not in group:
-                                group[crt_user] = 1
-                            else:
-                                group[crt_user] += 1
-                            crt_user = target_user_index
-                            break
-            for item in group.items():
-                new_sim_mat[index][item[0]] = item[1] / (distance * walk_times)
-        self.user_sim_mat = new_sim_mat
+    def get_nn_input_mat(self, umm, imm):
+        input_list = []
+        target_list = []
+        for user_id in self.data_udict:
+            for movie_id in self.data_udict[user_id]:
+                user_m = umm[self.user_index_dict[user_id]]
+                movie_m = imm[self.movie_index_dict[movie_id]]
+                input_list.append(np.append(user_m, movie_m))
+                target_list.append(self.data_udict[user_id][movie_id])
+        return np.array(input_list).astype(np.float32), np.array(target_list).astype(np.float32)
 
 
 if __name__ == "__main__":
