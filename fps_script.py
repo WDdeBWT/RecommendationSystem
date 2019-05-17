@@ -16,7 +16,7 @@ TEST_SIZE = 1000 # None means full size
 FUZZY_MODE = True
 SIM_WEIGHT = 0.8
 GROUP_MODE = True
-GROUP_DISTANCE = 5
+GROUP_DISTANCE = 3
 WALK_TIMES = 1000
 
 
@@ -69,9 +69,9 @@ def fps_script():
     maeLoss = float(sum_mae / TEST_SIZE)
     mseLoss = float(sum_mse / TEST_SIZE)
     hitRate = float(sum_hit / TEST_SIZE)
-    print('--- FUZZY_MODE: {} GROUP_MODE: {} TEST_SIZE: {} ---'.format(FUZZY_MODE, GROUP_MODE, TEST_SIZE))
-    print('- SIM_WEIGHT: {} GROUP_DISTANCE: {} WALK_TIMES: {}'.format(SIM_WEIGHT, GROUP_DISTANCE, WALK_TIMES))
-    print('- maeLoss: {:.2} mseLoss: {:.2} hitRate: {:.2}'.format(maeLoss, mseLoss, hitRate))
+    # print('--- FUZZY_MODE: {} GROUP_MODE: {} SIM_WEIGHT: {} GROUP_DISTANCE: {} WALK_TIMES: {} TEST_SIZE: {} ---'.format(FUZZY_MODE, GROUP_MODE, SIM_WEIGHT, GROUP_DISTANCE, WALK_TIMES, TEST_SIZE))
+    print('--- FUZZY_MODE: {} GROUP_MODE: {} SIM_WEIGHT: {} GROUP_DISTANCE: {} ---'.format(FUZZY_MODE, GROUP_MODE, SIM_WEIGHT, GROUP_DISTANCE))
+    print('> maeLoss: {:.2} mseLoss: {:.2} hitRate: {:.2}'.format(maeLoss, mseLoss, hitRate))
 
 
 if __name__ == "__main__":
