@@ -44,30 +44,29 @@ def test():
     data_path = 'data-least/ratings.csv'
     rate_list = utils.read_csv(data_path, show_detail=SHOW_DETAIL, shuffle=True)[1:]
     train_data, test_data = utils.split_data(rate_list, 1, show_detail=SHOW_DETAIL)
-    for SIM_WEIGHT in [0.5, 0.6, 0.7, 0.8, 0.9, 1.0]:
-        for FUZZY_MODE in [True, False]:
-            for GROUP_DISTANCE in [3, 5, 8]:
-                tdata = data.TrainData(train_data, show_detail=SHOW_DETAIL, only_hot=False)
-                tdata.get_rate_mat()
-                tdata.get_fuzzy_mat()
-                tdata.get_user_sim(fuzzy_mode=FUZZY_MODE)
-                if GROUP_MODE:
-                    tdata.get_user_group(GROUP_DISTANCE, WALK_TIMES)
+    tdata = data.TrainData(train_data, show_detail=SHOW_DETAIL, only_hot=False)
+    tdata.get_rate_mat()
+    tdata.get_fuzzy_mat()
+    tdata.get_user_sim(fuzzy_mode=FUZZY_MODE)
+    for GROUP_DISTANCE in [3, 5, 8]:
+        if GROUP_MODE:
+            tdata.get_user_group(GROUP_DISTANCE, WALK_TIMES)
 
-                sum_mae = 0
-                sum_mse = 0
-                sum_hit = 0
-                if TEST_SIZE is None:
-                    TEST_SIZE = len(test_data)
-                for index, rate in enumerate(test_data[:TEST_SIZE]):
-                    predict_value = user_based_model(rate[0], rate[1], tdata, SIM_WEIGHT)
-                    sum_mae += abs(predict_value - float(rate[2]))
-                    sum_mse += abs(predict_value - float(rate[2])) ** 2
-                    if abs(predict_value - float(rate[2])) < 1:
-                        sum_hit += 1
-                    if SHOW_DETAIL:
-                        time_str = time.strftime("%H:%M:%S", time.localtime())
-                        print('-time: {} - index: {} pre: {:.2} - real: {}'.format(time_str, index, predict_value, rate[2]))
+        for SIM_WEIGHT in [0.5, 0.6, 0.7, 0.8, 0.9, 1.0]:
+            sum_mae = 0
+            sum_mse = 0
+            sum_hit = 0
+            if TEST_SIZE is None:
+                TEST_SIZE = len(test_data)
+            for index, rate in enumerate(test_data[:TEST_SIZE]):
+                predict_value = user_based_model(rate[0], rate[1], tdata, SIM_WEIGHT)
+                sum_mae += abs(predict_value - float(rate[2]))
+                sum_mse += abs(predict_value - float(rate[2])) ** 2
+                if abs(predict_value - float(rate[2])) < 1:
+                    sum_hit += 1
+                if SHOW_DETAIL:
+                    time_str = time.strftime("%H:%M:%S", time.localtime())
+                    print('-time: {} - index: {} pre: {:.2} - real: {}'.format(time_str, index, predict_value, rate[2]))
 
                 maeLoss = float(sum_mae / TEST_SIZE)
                 mseLoss = float(sum_mse / TEST_SIZE)
