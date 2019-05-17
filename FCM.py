@@ -1,7 +1,8 @@
+import copy
+import time
+import math
 import random
 import operator
-import math
-import time
 
 import numpy as np
 
@@ -81,9 +82,9 @@ class FCM:
         # Membership Matrix
         membership_mat = self.initialize_membership_matrix()
         curr = 0
-        loss_old = 1
-        loss_new = 1
-        while curr <= self.max_iter:
+        loss_old = 100000000
+        loss_new = 100000000
+        while curr < self.max_iter:
             cluster_centers = self.calculate_cluster_center(membership_mat)
             # cluster_centers: (k, num_attr). k means k clusters. And num_attr means num_attr features.
             # 更新 membership_mat 矩阵
@@ -91,15 +92,17 @@ class FCM:
             # cluster_labels = getClusters(membership_mat)
             loss_old = loss_new
             loss_new = self.get_loss(membership_mat, cluster_centers)
+            if loss_new < loss_old:
+                best_membership_mat = copy.deepcopy(membership_mat)
             curr += 1
             if self.show_detail:
                 time_str = time.strftime("%H:%M:%S", time.localtime())
-                print('---time:{} - curr: {}/{} - loss: {}'.format(time_str, curr, self.max_iter, loss_new))
+                print('-time:{} - curr: {}/{} - loss: {}'.format(time_str, curr, self.max_iter, loss_new))
             if abs(loss_old - loss_new) / loss_old < 0.0001:
                 print('(loss_old - loss_new) / loss_old < 0.01%, FCM finish')
                 break
-        # print(membership_mat)
-        return membership_mat, cluster_centers
+        print(best_membership_mat[0])
+        return best_membership_mat
 
 
 if __name__ == "__main__":

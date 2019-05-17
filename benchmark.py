@@ -42,8 +42,8 @@ def test(show_detail):
             popularity = eva.popularity()
 
             log_list = []
-            print('--- sim_num: ' + str(sim_num) + ' --- recm_num: ' + str(recm_num) + ' ---')
-            log_list.append('--- sim_num: ' + str(sim_num) + ' --- recm_num: ' + str(recm_num) + ' ---')
+            print('- sim_num: ' + str(sim_num) + ' - recm_num: ' + str(recm_num) + ' -')
+            log_list.append('- sim_num: ' + str(sim_num) + ' - recm_num: ' + str(recm_num) + ' -')
             print('Recall:     ' + str(recall))
             log_list.append('Recall:     ' + str(recall))
             print('Precision:  ' + str(precision))
@@ -55,7 +55,7 @@ def test(show_detail):
             utils.write_log('log.txt', log_list)
     time_end = time.time()
     time_used = ("%.2f" % (time_end-time_start))
-    print('--- time_used: ' + str(time_used))
+    print('- time_used: ' + str(time_used))
 
 
 comm = MPI.COMM_WORLD

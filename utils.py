@@ -4,7 +4,7 @@ import time
 import random
 
 
-def read_csv(r_path, show_detail=True):
+def read_csv(r_path, show_detail=False, shuffle=False):
     content_list = []
     with open(r_path) as r:
         if show_detail:
@@ -20,10 +20,14 @@ def read_csv(r_path, show_detail=True):
                     print('Read index: ' + str(index))
         if show_detail:
             print('finish')
+    if shuffle is True:
+        temp_li = content_list[1:]
+        random.shuffle(temp_li)
+        content_list[1:] = temp_li
     return content_list
 
 
-def write_csv(w_path, content_list, show_detail=True):
+def write_csv(w_path, content_list, show_detail=False):
     with open(w_path, 'w', newline="") as w:
         if show_detail:
             print('Start write_csv... ', end='', flush=True)
@@ -39,12 +43,12 @@ def write_log(w_path, content_list):
     with open(w_path, 'a') as w:
         if content_list:
             time_str = time.strftime("%H:%M:%S", time.localtime())
-            w.write('\n--- time: ' + time_str + ' ---\n')
+            w.write('\n- time: ' + time_str + ' -\n')
             for line in content_list:
                 w.write(str(line) + '\n')
 
 
-def split_data(rate_list, round, show_detail=True):
+def split_data(rate_list, round, show_detail=False):
     train_data = []
     test_data = []
     if show_detail:

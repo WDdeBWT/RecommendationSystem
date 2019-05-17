@@ -18,7 +18,7 @@ class RecmModel:
                 time_str = time.strftime("%H:%M:%S", time.localtime())
                 if self.show_detail:
                     if Percentage % 10 == 0:
-                        print('---time: ' + time_str + ' - init_model: ' + str(Percentage) + '% ' + str(index) + '/' + str(len_tdata))
+                        print('-time: ' + time_str + ' - init_model: ' + str(Percentage) + '% ' + str(index) + '/' + str(len_tdata))
                 Percentage += 1
             if rate[0] not in self.data_udict:
                 self.data_udict[rate[0]] = []
@@ -63,7 +63,7 @@ class UserBasedModel(RecmModel):
             if index % (len_udict // 100) == 0:
                 time_str = time.strftime("%H:%M:%S", time.localtime())
                 if self.show_detail:
-                    print('---time: ' + time_str + ' - get_sim: ' + str(Percentage) + '% ' + str(index) + '/' + str(len_udict))
+                    print('-time: ' + time_str + ' - get_sim: ' + str(Percentage) + '% ' + str(index) + '/' + str(len_udict))
                 Percentage += 1
             sim_table[user_id] = {}
             for movie_id in self.data_udict[user_id]:
@@ -86,7 +86,7 @@ class UserBasedModel(RecmModel):
             if index % (len_table // 100) == 0:
                 time_str = time.strftime("%H:%M:%S", time.localtime())
                 if self.show_detail:
-                    print('---time: ' + time_str + ' - get_recm: ' + str(Percentage) + '% ' + str(index) + '/' + str(len_table))
+                    print('-time: ' + time_str + ' - get_recm: ' + str(Percentage) + '% ' + str(index) + '/' + str(len_table))
                 Percentage += 1
             recm_table[user_id] = {}
             for sim_user in self.sim_table[user_id]:

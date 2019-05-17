@@ -1,35 +1,34 @@
 import time
 import math
 
+import torch
+import torch.utils.data as torchdata
+import torch.nn.functional as F
 import numpy as np
 
-import utils
-import model_test
-import evaluator
-import data
 import FCM
+import data
+import utils
+import evaluator
+import model_test
+
+
+CLUSTERS = 5
 
 
 def test():
-    data_path = 'data-least/ratings.csv'
-    rate_list = utils.read_csv(data_path, False)[1:]
-    train_data, test_data = utils.split_data(rate_list, 1, False)
-    tdata = data.TrainData(train_data, show_detail=True, only_hot=False)
-    tdata.get_rate_mat()
+    data_path = 'data-sub/temp_list.csv'
+    rate_list = utils.read_csv(data_path, show_detail=False)[1:]
+    train_data, test_data = utils.split_data(rate_list, 1, show_detail=False)
+    tdata = data.TrainData(train_data, show_detail=True, only_hot=True)
+    # tdata.get_rate_mat()
+    tdata.get_user_sim()
 
-    fcm_u = FCM.FCM(tdata.rate_umat, 20, 20, show_detail=True)
-    user_membership_mat, user_cluster_centers = fcm_u.get_result()
+    fcm_u = FCM.FCM(tdata.user_sim_mat, CLUSTERS, 20, show_detail=True)
+    user_membership_mat = fcm_u.get_result()
     user_membership_mat = np.array(user_membership_mat)
-    user_cluster_centers = np.array(user_cluster_centers)
-    print(user_membership_mat.shape)
-    print(user_cluster_centers.shape)
-
-    fcm_i = FCM.FCM(tdata.rate_imat, 20, 20, show_detail=True)
-    movie_membership_mat, movie_cluster_centers = fcm_i.get_result()
-    movie_membership_mat = np.array(movie_membership_mat)
-    movie_cluster_centers = np.array(movie_cluster_centers)
-    print(movie_membership_mat.shape)
-    print(movie_cluster_centers.shape)    
+    print('user_membership_mat.shape: {}'.format(user_membership_mat.shape))
 
 
-test()
+if __name__ == "__main__":
+    test()

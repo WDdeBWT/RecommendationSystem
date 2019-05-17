@@ -5,7 +5,8 @@ import utils
 import model
 import evaluator
 
-data_path = '/Users/baiwentao/Code/RecommendationSystem/data-full/ratings.csv'
+# data_path = '/Users/baiwentao/Code/RecommendationSystem/data-full/ratings.csv'
+data_path = 'data-least/ratings.csv'
 write_path = '/Users/baiwentao/Code/RecommendationSystem/data-sub/'
 
 rate_list = utils.read_csv(data_path)
@@ -14,7 +15,7 @@ medium_list = [rate_list[0]]
 big_list = [rate_list[0]]
 
 for rate in rate_list[1:]:
-    if int(rate[0]) < 1000 and int(rate[1]) < 2000:
+    if int(rate[0]) <= 100:
         small_list.append(rate)
     # if int(rate[0]) < 10000 and int(rate[1]) < 4000:
     #     medium_list.append(rate)
@@ -23,6 +24,6 @@ for rate in rate_list[1:]:
 print(len(small_list)) # 351861
 # print(len(medium_list)) # 1049943
 # print(len(big_list)) # 2538594
-utils.write_csv(write_path + 'small1_list.csv', small_list)
+utils.write_csv(write_path + 'temp_list.csv', small_list)
 # utils.write_csv(write_path + 'medium_list.csv', medium_list)
 # utils.write_csv(write_path + 'big_list.csv', big_list)

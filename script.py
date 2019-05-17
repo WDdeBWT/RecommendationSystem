@@ -22,8 +22,8 @@ def test(show_detail):
     popularity = eva.popularity()
 
     log_list = []
-    print('--- sim_num: ' + str(sim_num) + ' --- recm_num: ' + str(recm_num) + ' ---')
-    log_list.append('--- sim_num: ' + str(sim_num) + ' --- recm_num: ' + str(recm_num) + ' ---')
+    print('- sim_num: ' + str(sim_num) + ' - recm_num: ' + str(recm_num) + ' -')
+    log_list.append('- sim_num: ' + str(sim_num) + ' - recm_num: ' + str(recm_num) + ' -')
     print('Recall:     ' + str(recall))
     log_list.append('Recall:     ' + str(recall))
     print('Precision:  ' + str(precision))
