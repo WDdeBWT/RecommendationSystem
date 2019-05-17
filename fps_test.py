@@ -14,7 +14,7 @@ SHOW_DETAIL = False
 TEST_SIZE = 1000 # None means full size
 
 FUZZY_MODE = True
-SIM_WEIGHT = 1.0
+SIM_WEIGHT = 0.8
 GROUP_MODE = True
 GROUP_DISTANCE = 5
 WALK_TIMES = 1000
@@ -47,33 +47,35 @@ def test():
     tdata = data.TrainData(train_data, show_detail=SHOW_DETAIL, only_hot=False)
     tdata.get_rate_mat()
     tdata.get_fuzzy_mat()
-    tdata.get_user_sim(fuzzy_mode=FUZZY_MODE)
-    for GROUP_DISTANCE in [3, 5, 8]:
-        if GROUP_MODE:
-            tdata.get_user_group(GROUP_DISTANCE, WALK_TIMES)
+    for FUZZY_MODE in [True, False]:
+        tdata.get_user_sim(fuzzy_mode=FUZZY_MODE)
+        for GROUP_MODE in [True, False]:
+            for GROUP_DISTANCE in [3, 5, 8]:
+                if GROUP_MODE:
+                    tdata.get_user_group(GROUP_DISTANCE, WALK_TIMES)
 
-        for SIM_WEIGHT in [0.5, 0.6, 0.7, 0.8, 0.9, 1.0]:
-            sum_mae = 0
-            sum_mse = 0
-            sum_hit = 0
-            if TEST_SIZE is None:
-                TEST_SIZE = len(test_data)
-            for index, rate in enumerate(test_data[:TEST_SIZE]):
-                predict_value = user_based_model(rate[0], rate[1], tdata, SIM_WEIGHT)
-                sum_mae += abs(predict_value - float(rate[2]))
-                sum_mse += abs(predict_value - float(rate[2])) ** 2
-                if abs(predict_value - float(rate[2])) < 1:
-                    sum_hit += 1
-                if SHOW_DETAIL:
-                    time_str = time.strftime("%H:%M:%S", time.localtime())
-                    print('-time: {} - index: {} pre: {:.2} - real: {}'.format(time_str, index, predict_value, rate[2]))
+                for SIM_WEIGHT in [0.6, 0.8, 1.0]:
+                    sum_mae = 0
+                    sum_mse = 0
+                    sum_hit = 0
+                    if TEST_SIZE is None:
+                        TEST_SIZE = len(test_data)
+                    for index, rate in enumerate(test_data[:TEST_SIZE]):
+                        predict_value = user_based_model(rate[0], rate[1], tdata, SIM_WEIGHT)
+                        sum_mae += abs(predict_value - float(rate[2]))
+                        sum_mse += abs(predict_value - float(rate[2])) ** 2
+                        if abs(predict_value - float(rate[2])) < 1:
+                            sum_hit += 1
+                        if SHOW_DETAIL:
+                            time_str = time.strftime("%H:%M:%S", time.localtime())
+                            print('-time: {} - index: {} pre: {:.2} - real: {}'.format(time_str, index, predict_value, rate[2]))
 
-                maeLoss = float(sum_mae / TEST_SIZE)
-                mseLoss = float(sum_mse / TEST_SIZE)
-                hitRate = float(sum_hit / TEST_SIZE)
-                print('--- FUZZY_MODE: {} GROUP_MODE: {} TEST_SIZE: {} ---'.format(FUZZY_MODE, GROUP_MODE, TEST_SIZE))
-                print('- SIM_WEIGHT: {} GROUP_DISTANCE: {} WALK_TIMES: {}'.format(SIM_WEIGHT, GROUP_DISTANCE, WALK_TIMES))
-                print('- maeLoss: {:.2} mseLoss: {:.2} hitRate: {:.2}'.format(maeLoss, mseLoss, hitRate))
+                        maeLoss = float(sum_mae / TEST_SIZE)
+                        mseLoss = float(sum_mse / TEST_SIZE)
+                        hitRate = float(sum_hit / TEST_SIZE)
+                        print('--- FUZZY_MODE: {} SIM_WEIGHT: {} TEST_SIZE: {} ---'.format(FUZZY_MODE, SIM_WEIGHT, TEST_SIZE))
+                        print('- GROUP_MODE: {} GROUP_DISTANCE: {} WALK_TIMES: {}'.format(GROUP_MODE, GROUP_DISTANCE, WALK_TIMES))
+                        print('- maeLoss: {:.2} mseLoss: {:.2} hitRate: {:.2}'.format(maeLoss, mseLoss, hitRate))
 
 
 if __name__ == "__main__":
