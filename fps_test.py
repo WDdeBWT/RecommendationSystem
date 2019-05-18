@@ -11,13 +11,13 @@ import model_test
 
 
 SHOW_DETAIL = False
-TEST_SIZE = 1000 # None means full size
+TEST_SIZE = None # None means full size
 
 FUZZY_MODE = True
 SIM_WEIGHT = 0.8
 GROUP_MODE = True
 GROUP_DISTANCE = 3
-WALK_TIMES = None
+WALK_TIMES = 1000
 
 
 def user_based_model(user_id, movie_id, tdata, sim_weight):
@@ -62,6 +62,9 @@ def test():
             FUZZY_MODE = True
             GROUP_MODE = False
         if setting_num == 2:
+            FUZZY_MODE = False
+            GROUP_MODE = True
+        if setting_num == 3:
             FUZZY_MODE = True
             GROUP_MODE = True
         tdata.get_user_sim(fuzzy_mode=FUZZY_MODE)

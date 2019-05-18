@@ -83,13 +83,23 @@ class TrainData:
 
     def get_fuzzy_mat(self):
 
+        # def get_fuzzy_rate(max_score, inp_score):
+        #     rate = np.zeros(3)
+        #     mid_score = max_score / 2
+        #     rate[2] = inp_score/max_score
+        #     rate[1] = 1 - abs(inp_score - mid_score) / mid_score
+        #     rate[0] = 1 - rate[2]
+        #     return rate/sum(rate)
+
         def get_fuzzy_rate(max_score, inp_score):
+            mid_score = max_score * 0.6
             rate = np.zeros(3)
-            mid_score = max_score / 2
-            rate[2] = inp_score/max_score
-            rate[1] = 1 - abs(inp_score - mid_score) / mid_score
-            rate[0] = 1 - rate[2]
-            return rate/sum(rate)
+            if inp_score > mid_score:
+                rate[2] = (inp_score - mid_score) / max_score - mid_score
+            else:
+                rate[0] = (mid_score - inp_score) / mid_score
+            rate[1] = 1 - rate[0] - rate[2]
+            return rate
 
         fuzzy_mat = np.zeros((len(self.user_list), len(self.movie_list), 3)) # shape = user * item * class
         for index, user_id in enumerate(self.user_list):
