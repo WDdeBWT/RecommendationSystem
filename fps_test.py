@@ -54,7 +54,7 @@ def test():
     tdata = data.TrainData(train_data, show_detail=SHOW_DETAIL, only_hot=False)
     tdata.get_rate_mat()
     tdata.get_fuzzy_mat()
-    for setting_num in range(3):
+    for setting_num in range(4):
         if setting_num == 0:
             FUZZY_MODE = False
             GROUP_MODE = False
