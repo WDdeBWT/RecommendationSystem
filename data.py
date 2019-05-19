@@ -107,9 +107,9 @@ class TrainData:
                 time_str = time.strftime("%H:%M:%S", time.localtime())
                 print('-time: {} - TrainData.get_fuzzy_mat {}/{}'.format(time_str, str(index+1), str(len(self.data_udict))))
             for movie_id in self.data_udict[user_id]:
-                rate = get_fuzzy_rate(5, self.data_udict[user_id][movie_id])
+                fuzzy_rate = get_fuzzy_rate(5, self.data_udict[user_id][movie_id])
                 for i in range(3):
-                    fuzzy_mat[self.user_index_dict[user_id]][self.movie_index_dict[movie_id]][i] = rate[i]
+                    fuzzy_mat[self.user_index_dict[user_id]][self.movie_index_dict[movie_id]][i] = fuzzy_rate[i]
         self.fuzzy_mat = fuzzy_mat
 
     def get_user_sim(self, fuzzy_mode=True):
@@ -117,6 +117,14 @@ class TrainData:
             num = np.dot(v1, v2)
             denom = np.linalg.norm(v1) * np.linalg.norm(v2)
             return num / denom
+
+        def gen_pcc_sim(u_avg, v_avg, urates, vrates):
+            if not urates or not vrates: return 0.00
+            u_diff = [x - u_avg for x in urates]
+            v_diff = [x - v_avg for x in vrates]
+            a = sum(x * y for x, y in zip(u_diff, v_diff))
+            b = (sum(x**2 for x in u_diff) * sum(y**2 for y in v_diff))**0.5
+            return a / b if b else 0.00
 
         user_sim_mat = np.zeros((len(self.user_list), len(self.user_list)))
         for index, user_id in enumerate(self.user_list):
@@ -133,7 +141,8 @@ class TrainData:
                     for movie_id in self.movie_list:
                         if movie_id in self.data_udict[user_id] and movie_id in self.data_udict[target_user_id]:
                             mi = self.movie_index_dict[movie_id] # movie_index
-                            user_sim_mat[ui][ti] += get_cos_sim(self.fuzzy_mat[ui][mi], self.fuzzy_mat[ti][mi])
+                            # user_sim_mat[ui][ti] += get_cos_sim(self.fuzzy_mat[ui][mi], self.fuzzy_mat[ti][mi])
+                            user_sim_mat[ui][ti] += gen_pcc_sim(3, 3, self.fuzzy_mat[ui][mi].tolist(), self.fuzzy_mat[ti][mi].tolist())
                             common_count += 1
                     if common_count != 0:
                         user_sim_mat[ui][ti] /= common_count
