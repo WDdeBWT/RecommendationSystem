@@ -6,8 +6,6 @@ import numpy as np
 
 import data
 import utils
-import evaluator
-import model_test
 
 
 SHOW_DETAIL = False
@@ -84,7 +82,7 @@ def test():
             sum_mse += abs(predict_value - float(rate[2])) ** 2
             if abs(predict_value - float(rate[2])) < 0.5:
                 sum_hit += 1
-            if sum(1 for x in tdata.rate_umat[tdata.user_index_dict[rate[0]]] if x > 0) < 5:
+            if sum(1 for x in tdata.rate_umat[tdata.user_index_dict[rate[0]]] if x > 0) <= 20:
                 cold_num += 1
                 if abs(predict_value - float(rate[2])) < 0.5:
                     cold_hit += 1
