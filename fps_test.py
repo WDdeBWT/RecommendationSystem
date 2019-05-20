@@ -48,7 +48,7 @@ def test():
     global WALK_TIMES
     data_path = 'data-least/ratings.csv'
     rate_list = utils.read_csv(data_path, show_detail=SHOW_DETAIL, shuffle=True)[1:]
-    train_data, test_data = utils.split_data(rate_list, 1, show_detail=SHOW_DETAIL)
+    train_data, test_data = utils.split_data(rate_list, 5, show_detail=SHOW_DETAIL)
     tdata = data.TrainData(train_data, show_detail=SHOW_DETAIL, only_hot=False)
     tdata.get_rate_mat()
     tdata.get_fuzzy_mat()

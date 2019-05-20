@@ -48,14 +48,14 @@ def write_log(w_path, content_list):
                 w.write(str(line) + '\n')
 
 
-def split_data(rate_list, round, show_detail=False):
+def split_data(rate_list, train_ratio, show_detail=False):
     train_data = []
     test_data = []
     if show_detail:
         print('Start split_data... ', end='', flush=True)
     for index, rate in enumerate(rate_list):
-        # if random.randint(1,10) == round:
-        if index % 10 == round:
+        if random.randint(1,10) >= train_ratio:
+        # if index % 10 == round:
             test_data.append(rate)
         else:
             train_data.append(rate)
