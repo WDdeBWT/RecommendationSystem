@@ -155,7 +155,8 @@ class TrainData:
                             target_user_hit_list.append(self.data_udict[target_user_id][movie_id])
                     if len(user_hit_list) != 0:
                         user_sim_mat[ui][ti] += get_cos_sim(np.array(user_hit_list), np.array(target_user_hit_list))
-            user_sim_mat[self.user_index_dict[user_id]] /= sum(user_sim_mat[self.user_index_dict[user_id]])
+            if sum(user_sim_mat[self.user_index_dict[user_id]]) != 0:
+                user_sim_mat[self.user_index_dict[user_id]] /= sum(user_sim_mat[self.user_index_dict[user_id]])
         self.user_sim_mat = user_sim_mat
 
     def get_user_group(self, distance, walk_times = 1000):
