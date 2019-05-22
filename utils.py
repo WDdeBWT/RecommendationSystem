@@ -54,7 +54,7 @@ def split_data(rate_list, train_ratio, show_detail=False):
     if show_detail:
         print('Start split_data... ', end='', flush=True)
     for index, rate in enumerate(rate_list):
-        if random.randint(1,10) >= train_ratio:
+        if random.randint(1,10) > train_ratio:
         # if index % 10 == round:
             test_data.append(rate)
         else:
