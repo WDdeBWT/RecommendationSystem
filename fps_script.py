@@ -6,8 +6,6 @@ import numpy as np
 
 import data
 import utils
-import evaluator
-import model_test
 
 
 SHOW_DETAIL = True
@@ -18,6 +16,8 @@ SIM_WEIGHT = 0.8
 GROUP_MODE = True
 GROUP_DISTANCE = 3
 WALK_TIMES = 1000
+COLD_NUM = 10
+PRECISION_RANGE = 1
 
 
 def user_based_model(user_id, movie_id, tdata, sim_weight):
@@ -41,9 +41,18 @@ def user_based_model(user_id, movie_id, tdata, sim_weight):
 
 
 def fps_script():
+    global SHOW_DETAIL
+    global TEST_SIZE
+    global FUZZY_MODE
+    global SIM_WEIGHT
+    global GROUP_MODE
+    global GROUP_DISTANCE
+    global WALK_TIMES
+    global COLD_NUM
+    global PRECISION_RANGE
     data_path = 'data-least/ratings.csv'
     rate_list = utils.read_csv(data_path, show_detail=SHOW_DETAIL, shuffle=True)[1:]
-    train_data, test_data = utils.split_data(rate_list, 1, show_detail=SHOW_DETAIL)
+    train_data, test_data = utils.split_data(rate_list, 5, show_detail=SHOW_DETAIL)
     tdata = data.TrainData(train_data, show_detail=SHOW_DETAIL, only_hot=False)
     tdata.get_rate_mat()
     tdata.get_fuzzy_mat()
@@ -54,14 +63,20 @@ def fps_script():
     sum_mae = 0
     sum_mse = 0
     sum_hit = 0
+    cold_num = 0
+    cold_hit = 0
     if TEST_SIZE is None:
         TEST_SIZE = len(test_data)
     for index, rate in enumerate(test_data[:TEST_SIZE]):
         predict_value = user_based_model(rate[0], rate[1], tdata, SIM_WEIGHT)
         sum_mae += abs(predict_value - float(rate[2]))
         sum_mse += abs(predict_value - float(rate[2])) ** 2
-        if abs(predict_value - float(rate[2])) < 1:
+        if abs(predict_value - float(rate[2])) < PRECISION_RANGE:
             sum_hit += 1
+        if sum(1 for x in tdata.rate_umat[tdata.user_index_dict[rate[0]]] if x > 0) <= COLD_NUM:
+            cold_num += 1
+            if abs(predict_value - float(rate[2])) < PRECISION_RANGE:
+                cold_hit += 1
         if SHOW_DETAIL:
             time_str = time.strftime("%H:%M:%S", time.localtime())
             print('-time: {} - index: {} pre: {:.2} - real: {}'.format(time_str, index, predict_value, rate[2]))
@@ -69,9 +84,10 @@ def fps_script():
     maeLoss = float(sum_mae / TEST_SIZE)
     mseLoss = float(sum_mse / TEST_SIZE)
     hitRate = float(sum_hit / TEST_SIZE)
+    coldHitRate = float(cold_hit / cold_num)
     # print('--- FUZZY_MODE: {} GROUP_MODE: {} SIM_WEIGHT: {} GROUP_DISTANCE: {} WALK_TIMES: {} TEST_SIZE: {} ---'.format(FUZZY_MODE, GROUP_MODE, SIM_WEIGHT, GROUP_DISTANCE, WALK_TIMES, TEST_SIZE))
-    print('--- FUZZY_MODE: {} GROUP_MODE: {} SIM_WEIGHT: {} GROUP_DISTANCE: {} ---'.format(FUZZY_MODE, GROUP_MODE, SIM_WEIGHT, GROUP_DISTANCE))
-    print('> maeLoss: {:.2} mseLoss: {:.2} hitRate: {:.2}'.format(maeLoss, mseLoss, hitRate))
+    print('----- FUZZY_MODE: {} GROUP_MODE: {} -----'.format(FUZZY_MODE, GROUP_MODE))
+    print('> maeLoss: {:.2} mseLoss: {:.2} hitRate: {:.2} coldHitRate: {:.2}'.format(maeLoss, mseLoss, hitRate, coldHitRate))
 
 
 if __name__ == "__main__":

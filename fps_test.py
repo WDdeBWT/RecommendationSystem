@@ -16,6 +16,8 @@ SIM_WEIGHT = 0.8
 GROUP_MODE = True
 GROUP_DISTANCE = 3
 WALK_TIMES = 1000
+COLD_NUM = 10
+PRECISION_RANGE = 1
 
 
 def user_based_model(user_id, movie_id, tdata, sim_weight):
@@ -46,6 +48,8 @@ def test():
     global GROUP_MODE
     global GROUP_DISTANCE
     global WALK_TIMES
+    global COLD_NUM
+    global PRECISION_RANGE
     data_path = 'data-least/ratings.csv'
     rate_list = utils.read_csv(data_path, show_detail=SHOW_DETAIL, shuffle=True)[1:]
     train_data, test_data = utils.split_data(rate_list, 5, show_detail=SHOW_DETAIL)
@@ -80,11 +84,11 @@ def test():
             predict_value = user_based_model(rate[0], rate[1], tdata, SIM_WEIGHT)
             sum_mae += abs(predict_value - float(rate[2]))
             sum_mse += abs(predict_value - float(rate[2])) ** 2
-            if abs(predict_value - float(rate[2])) < 0.5:
+            if abs(predict_value - float(rate[2])) < PRECISION_RANGE:
                 sum_hit += 1
-            if sum(1 for x in tdata.rate_umat[tdata.user_index_dict[rate[0]]] if x > 0) <= 20:
+            if sum(1 for x in tdata.rate_umat[tdata.user_index_dict[rate[0]]] if x > 0) <= COLD_NUM:
                 cold_num += 1
-                if abs(predict_value - float(rate[2])) < 0.5:
+                if abs(predict_value - float(rate[2])) < PRECISION_RANGE:
                     cold_hit += 1
             if SHOW_DETAIL:
                 time_str = time.strftime("%H:%M:%S", time.localtime())
