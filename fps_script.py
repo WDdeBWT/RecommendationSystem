@@ -18,7 +18,7 @@ GROUP_MODE = True
 GROUP_DISTANCE = 3
 WALK_TIMES = 1000
 COLD_NUM = 20
-PRECISION_RANGE = 1
+PRECISION_RANGE = 0.8
 
 
 def user_based_model(user_id, movie_id, tdata, sim_weight):
