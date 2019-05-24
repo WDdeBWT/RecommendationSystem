@@ -3,6 +3,7 @@ import time
 import math
 
 import numpy as np
+import matplotlib.pyplot as plt
 
 import data
 import utils
@@ -16,7 +17,7 @@ SIM_WEIGHT = 0.8
 GROUP_MODE = True
 GROUP_DISTANCE = 3
 WALK_TIMES = 1000
-COLD_NUM = 10
+COLD_NUM = 20
 PRECISION_RANGE = 1
 
 
@@ -52,7 +53,7 @@ def fps_script():
     global PRECISION_RANGE
     data_path = 'data-least/ratings.csv'
     rate_list = utils.read_csv(data_path, show_detail=SHOW_DETAIL, shuffle=True)[1:]
-    train_data, test_data = utils.split_data(rate_list, 5, show_detail=SHOW_DETAIL)
+    train_data, test_data = utils.split_data(rate_list, 8, show_detail=SHOW_DETAIL)
     tdata = data.TrainData(train_data, show_detail=SHOW_DETAIL, only_hot=False)
     tdata.get_rate_mat()
     tdata.get_fuzzy_mat()
@@ -65,6 +66,19 @@ def fps_script():
     sum_hit = 0
     cold_num = 0
     cold_hit = 0
+    # plt
+    if SHOW_DETAIL:
+        x = np.array([])
+        y1 = np.array([])
+        y2 = np.array([])
+        plt.figure(figsize=(10, 5))
+        plt.ylim((0, 5.9))
+        plt.ion()
+        plt.xlabel('test sample')
+        plt.ylabel('rate')
+        plt.plot(x, y1, color='red', label='predict value')
+        plt.plot(x, y2, color='blue', label='real value')
+        plt.legend(loc='upper right')
     if TEST_SIZE is None:
         TEST_SIZE = len(test_data)
     for index, rate in enumerate(test_data[:TEST_SIZE]):
@@ -73,13 +87,20 @@ def fps_script():
         sum_mse += abs(predict_value - float(rate[2])) ** 2
         if abs(predict_value - float(rate[2])) < PRECISION_RANGE:
             sum_hit += 1
-        if sum(1 for x in tdata.rate_umat[tdata.user_index_dict[rate[0]]] if x > 0) <= COLD_NUM:
+        if rate[0] in tdata.user_index_dict and sum(1 for x in tdata.rate_umat[tdata.user_index_dict[rate[0]]] if x > 0) <= COLD_NUM:
             cold_num += 1
             if abs(predict_value - float(rate[2])) < PRECISION_RANGE:
                 cold_hit += 1
         if SHOW_DETAIL:
             time_str = time.strftime("%H:%M:%S", time.localtime())
             print('-time: {} - index: {} pre: {:.2} - real: {}'.format(time_str, index, predict_value, rate[2]))
+            if index < 20:
+                x = np.append(x, str(index + 1))
+                y1 = np.append(y1, predict_value)
+                y2 = np.append(y2, float(rate[2]))
+                plt.plot(x, y1, color='red', label='predict value')
+                plt.plot(x, y2, color='blue', label='real value')
+                plt.draw(); plt.pause(0.05)
 
     maeLoss = float(sum_mae / TEST_SIZE)
     mseLoss = float(sum_mse / TEST_SIZE)
@@ -88,6 +109,9 @@ def fps_script():
     # print('--- FUZZY_MODE: {} GROUP_MODE: {} SIM_WEIGHT: {} GROUP_DISTANCE: {} WALK_TIMES: {} TEST_SIZE: {} ---'.format(FUZZY_MODE, GROUP_MODE, SIM_WEIGHT, GROUP_DISTANCE, WALK_TIMES, TEST_SIZE))
     print('----- FUZZY_MODE: {} GROUP_MODE: {} -----'.format(FUZZY_MODE, GROUP_MODE))
     print('> maeLoss: {:.2} mseLoss: {:.2} hitRate: {:.2} coldHitRate: {:.2}'.format(maeLoss, mseLoss, hitRate, coldHitRate))
+    if SHOW_DETAIL:
+        plt.ioff()
+        plt.show()
 
 
 if __name__ == "__main__":
